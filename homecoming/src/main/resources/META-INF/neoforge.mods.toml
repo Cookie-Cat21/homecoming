@@ -3,7 +3,7 @@ loaderVersion="[4,)"
 license="All Rights Reserved"
 [[mods]]
 modId="homecoming"
-version="0.1.0"
+version="0.2.0-alpha.1"
 displayName="Homecoming"
 description='''A factual, team-aware catch-up briefing for returning players.'''
 [[dependencies.homecoming]]
@@ -21,9 +21,15 @@ side="BOTH"
 [[dependencies.homecoming]]
 modId="ftbquests"
 type="optional"
-versionRange="[2101.1.37,2102)"
+versionRange="[2101.1.37]"
 ordering="AFTER"
 side="BOTH"
+[[dependencies.homecoming]]
+modId="xaerominimap"
+type="optional"
+versionRange="[26.6.0]"
+ordering="AFTER"
+side="CLIENT"
 [[dependencies.homecoming]]
 modId="ftbteams"
 type="optional"

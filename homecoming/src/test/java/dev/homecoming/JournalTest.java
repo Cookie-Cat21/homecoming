@@ -6,6 +6,27 @@ import com.google.gson.Gson;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JournalTest {
+    @Test void leavingAndRejoiningDoesNotRestoreOldTeamHistory() {
+        var j = enrolled();
+        j.updateTeam("alice", "team");
+        j.add(100, "quest", "q1", "team", Set.of("alice", "bob"), "Before leaving", null);
+        j.updateTeam("alice", "other");
+        j.updateTeam("alice", "team");
+        assertTrue(j.unread("alice", "team", 101).isEmpty());
+        assertEquals(1, j.unread("bob", "team", 101).size());
+        j.add(102, "quest", "q2", "team", Set.of("alice"), "After rejoining", null);
+        assertEquals("After rejoining", j.unread("alice", "team", 103).getFirst().message());
+    }
+    @Test void configuredLimitsApplyAfterSerialization() {
+        var j = enrolled();
+        j.configure(1000, 2);
+        for (int i = 0; i < 3; i++) j.add(100 + i, "quest", "q" + i, "team", Set.of("alice"), "Q", null);
+        assertEquals(2, j.facts.size());
+        var restored = new Gson().fromJson(new Gson().toJson(j), Journal.class);
+        restored.configure(50, 1);
+        assertTrue(restored.unread("alice", "team", 200).isEmpty());
+        assertThrows(IllegalArgumentException.class, () -> restored.configure(0, 1));
+    }
     private Journal enrolled() {
         var journal = new Journal();
         journal.player("alice").enabled = true;

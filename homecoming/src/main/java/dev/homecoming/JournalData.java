@@ -20,13 +20,15 @@ public final class JournalData extends SavedData {
             throw new IllegalStateException("Invalid Homecoming journal; restore its backup");
     }
     public static JournalData get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(
+        var data = server.overworld().getDataStorage().computeIfAbsent(
                 new SavedData.Factory<>(() -> {
                     // SavedData catches decoder failures. Never silently replace an unreadable existing journal.
                     if (Files.exists(server.getWorldPath(LevelResource.ROOT).resolve("data/homecoming.dat")))
                         throw new IllegalStateException("Existing Homecoming data could not be loaded; restore a backup before continuing");
                     return new JournalData();
                 }, JournalData::new, null), "homecoming");
+        data.journal.configure(HomecomingConfig.RETENTION_DAYS.get() * 86_400_000L, HomecomingConfig.MAX_FACTS.get());
+        return data;
     }
     @Override public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         tag.putInt("schema", 1);

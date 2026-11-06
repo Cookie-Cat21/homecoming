@@ -7,6 +7,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
@@ -20,7 +23,9 @@ import java.util.*;
 public final class Homecoming {
     static Integration integration = new Integration() {};
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("MMM d HH:mm 'UTC'").withZone(ZoneOffset.UTC);
-    public Homecoming() {
+    public Homecoming(ModContainer container, IEventBus modBus) {
+        container.registerConfig(ModConfig.Type.SERVER, HomecomingConfig.SPEC);
+        modBus.addListener(HomecomingNetwork::register);
         if (ModList.get().isLoaded("ftbquests") && ModList.get().isLoaded("ftbteams")) {
             integration = new FtbIntegration();
         }
@@ -33,17 +38,20 @@ public final class Homecoming {
         default String team(ServerPlayer player) { return player.getStringUUID(); }
         default Set<String> members(ServerPlayer player) { return Set.of(player.getStringUUID()); }
         default boolean visible(ServerPlayer player, Journal.Fact fact) { return !fact.source().startsWith("ftb"); }
-        default List<String> suggestions(ServerPlayer player) { return List.of(); }
+        default List<BriefingView.Suggestion> suggestions(ServerPlayer player) { return List.of(); }
+        default String chapterKey(Journal.Fact fact) { return ""; }
+        default Component rowMessage(Briefing.Row row) { return Component.literal(row.message()); }
         default String status() { return "Vanilla milestones; FTB Quests + Teams not installed"; }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         var data = JournalData.get(player.server);
         var state = data.journal.player(player.getStringUUID());
+        data.journal.updateTeam(player.getStringUUID(), integration.team(player));
         if (!state.enabled) {
             player.sendSystemMessage(Component.literal("Homecoming: optional catch-up briefings for shared progress. ")
                     .append(button("[Enable]", "/recap enable")));
-        } else if (System.currentTimeMillis() - state.lastLogout >= 24L * 60 * 60 * 1000) {
+        } else if (!state.quiet && state.lastLogout > 0 && System.currentTimeMillis() - state.lastLogout >= HomecomingConfig.RETURN_HOURS.get() * 3_600_000L) {
             player.sendSystemMessage(Component.literal("Welcome back. ").append(button("[Catch up]", "/recap")));
         }
         data.setDirty();
@@ -52,6 +60,7 @@ public final class Homecoming {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         var data = JournalData.get(player.server);
         data.journal.player(player.getStringUUID()).lastLogout = System.currentTimeMillis();
+        HomecomingNetwork.forget(player.getUUID());
         data.setDirty();
     }
     private void advancement(AdvancementEvent.AdvancementEarnEvent event) {
@@ -77,10 +86,7 @@ public final class Homecoming {
                 .executes(ctx -> show(ctx.getSource().getPlayerOrException()))
                 .then(Commands.literal("enable").executes(ctx -> {
                     var p = ctx.getSource().getPlayerOrException();
-                    var d = JournalData.get(p.server);
-                    var s = d.journal.player(p.getStringUUID());
-                    if (!s.enabled) { s.enabled = true; s.acknowledged = d.journal.sequence; s.offered = d.journal.sequence; }
-                    d.setDirty();
+                    enable(p);
                     p.sendSystemMessage(Component.literal("Homecoming enabled. Future shared milestones will appear here. /recap disable to stop."));
                     return 1;
                 }))
@@ -97,6 +103,12 @@ public final class Homecoming {
                 .then(Commands.literal("status").executes(ctx -> {
                     ctx.getSource().sendSuccess(() -> Component.literal(integration.status()), false); return 1;
                 }))
+                .then(Commands.literal("quiet").executes(ctx -> {
+                    var p = ctx.getSource().getPlayerOrException(); var d = JournalData.get(p.server);
+                    var s = d.journal.player(p.getStringUUID()); s.quiet = !s.quiet; d.setDirty();
+                    p.sendSystemMessage(Component.literal(s.quiet ? "Return prompts muted. /recap still works." : "Return prompts enabled."));
+                    return 1;
+                }))
                 .then(Commands.literal("share").then(Commands.argument("name", StringArgumentType.greedyString()).executes(ctx -> {
                     var p = ctx.getSource().getPlayerOrException(); var d = JournalData.get(p.server);
                     if (!d.journal.player(p.getStringUUID()).enabled) { p.sendSystemMessage(Component.literal("Enable Homecoming first: /recap enable")); return 0; }
@@ -110,14 +122,18 @@ public final class Homecoming {
                 }))));
     }
     private int show(ServerPlayer player) {
+        if (HomecomingNetwork.supported(player)) { HomecomingNetwork.send(player); return 1; }
         var data = JournalData.get(player.server); var journal = data.journal;
         var state = journal.player(player.getStringUUID());
         if (!state.enabled) { player.sendSystemMessage(button("[Enable Homecoming]", "/recap enable")); return 0; }
-        var facts = journal.unread(player.getStringUUID(), integration.team(player), System.currentTimeMillis()).stream()
-                .filter(f -> integration.visible(player, f)).limit(5).toList();
+        journal.updateTeam(player.getStringUUID(), integration.team(player));
+        var eligible = journal.unread(player.getStringUUID(), integration.team(player), System.currentTimeMillis()).stream()
+                .filter(f -> integration.visible(player, f)).toList();
+        var facts = Briefing.select(eligible, HomecomingConfig.PAGE_SIZE.get(),
+                HomecomingConfig.GROUP_MINUTES.get() * 60_000L, integration::chapterKey);
         player.sendSystemMessage(Component.literal("— Homecoming —"));
         if (state.acknowledged < journal.droppedThrough)
-            player.sendSystemMessage(Component.literal("Some older history expired (30 days / 2,000 updates)."));
+            player.sendSystemMessage(Component.literal("Some older history expired under this server's retention settings."));
         if (facts.isEmpty()) player.sendSystemMessage(Component.literal("No new shared updates recorded for you."));
         for (var fact : facts) {
             player.sendSystemMessage(Component.literal(DATE.format(Instant.ofEpochMilli(fact.time())) + " · " + fact.message()));
@@ -129,11 +145,33 @@ public final class Homecoming {
             }
         }
         if (!facts.isEmpty()) {
-            state.offered = facts.getLast().id();
+            state.offered = facts.getLast().through();
             player.sendSystemMessage(button("[Mark these read]", "/recap read").copy().append("  ").append(button("[Refresh]", "/recap")));
         }
-        for (String suggestion : integration.suggestions(player))
-            player.sendSystemMessage(Component.literal("Available in your quest book: " + suggestion));
+        for (var suggestion : integration.suggestions(player))
+            player.sendSystemMessage(Component.literal("Available in your quest book: " + suggestion.chapter() + " / " + suggestion.title()));
         data.setDirty(); return facts.size();
+    }
+    static void enable(ServerPlayer player) {
+        var data = JournalData.get(player.server); var state = data.journal.player(player.getStringUUID());
+        if (!state.enabled) {
+            state.enabled = true; state.acknowledged = data.journal.sequence; state.offered = data.journal.sequence;
+        }
+        data.journal.updateTeam(player.getStringUUID(), integration.team(player)); data.setDirty();
+    }
+    static BriefingView view(ServerPlayer player) {
+        var data = JournalData.get(player.server); var journal = data.journal;
+        var state = journal.player(player.getStringUUID());
+        journal.updateTeam(player.getStringUUID(), integration.team(player));
+        if (!state.enabled) return new BriefingView(false, state.quiet, false, List.of(), List.of(), integration.status());
+        var facts = journal.unread(player.getStringUUID(), integration.team(player), System.currentTimeMillis()).stream()
+                .filter(f -> integration.visible(player, f)).toList();
+        var selected = Briefing.select(facts, HomecomingConfig.PAGE_SIZE.get(), HomecomingConfig.GROUP_MINUTES.get() * 60_000L, integration::chapterKey);
+        if (!selected.isEmpty()) state.offered = selected.getLast().through();
+        data.setDirty();
+        return new BriefingView(true, state.quiet, state.acknowledged < journal.droppedThrough,
+                selected.stream().map(row -> new BriefingView.Entry(row.through(), row.time(), row.message(),
+                        Component.Serializer.toJson(integration.rowMessage(row), player.registryAccess()), row.place(), row.count())).toList(),
+                integration.suggestions(player), integration.status());
     }
 }

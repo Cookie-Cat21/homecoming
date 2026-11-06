@@ -1,6 +1,6 @@
-# Homecoming 0.1.0 — Minecraft 1.21.1 / NeoForge
+# Homecoming 0.2.0-alpha.1 — Minecraft 1.21.1 / NeoForge
 
-Validation: `gradlew build` succeeded with Java 21; all 6 journal tests passed (audience isolation, acknowledgment, opt-out, retention/deduplication, enrollment, and serialization). A live two-player FTB session and Xaero client integration have not been tested.
+Validation: eleven model tests pass. Two separate dedicated GameTest JVM runs loaded the pinned FTB integrations and verified read/unread state from the real world SavedData file. The native client opens and enrollment works. Live quest-event coverage, Xaero behavior and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
 
 An early, opt-in catch-up mod for a small friend-group SMP. Play normally; returning players can read shared milestones without maintaining another quest book.
 
@@ -10,14 +10,14 @@ An early, opt-in catch-up mod for a small friend-group SMP. Play normally; retur
 - FTB Quests completion events, team audience snapshots, current-team checks, and up to two currently available visible quests.
 - Selected vanilla advancement milestones (Nether, End, dragon and netherite armor).
 - `/recap share <name>` explicitly shares your current dimension and coordinates with enrolled current teammates. Coordinates in a recap can be copied. Without FTB, locations and milestones are personal only.
-- `/recap` displays five unread updates; `/recap read` acknowledges only the displayed range. Repeat to read additional pages. Reading does not acknowledge automatically.
-- A quiet return prompt after 24 hours away; `/recap` is always available.
+- `/recap` opens the native journal when Homecoming is installed on both ends, with Updates, Next steps and Settings tabs. Server-only installation falls back to chat. The default page contains five rows; related consecutive quest events can collapse into one row. Explicit acknowledgment consumes only the displayed range.
+- A return prompt after 24 hours away; `/recap quiet` or Settings mutes it. `/recap` is always available.
 - World-local persistence in `data/homecoming.dat`, with 30-day / 2,000-entry retention and notices when older history expires.
 - `/recap status` reports whether FTB integration is loaded.
 
 ## Install / build
 
-Use **Minecraft 1.21.1, NeoForge 21.1.265 or newer within 21.1, Java 21**. Put `homecoming-0.1.0.jar` from `build/libs` in the server's mods folder. The current text-only interface uses vanilla chat and does not require a Homecoming client mod. Optional mods have their own client/server requirements.
+Use **Minecraft 1.21.1, NeoForge 21.1.265 or newer within 21.1, Java 21**. Put `homecoming-0.2.0-alpha.1.jar` from `build/libs` in server and client mods folders for the journal UI. Server-only installation uses chat. Optional mods have their own client/server requirements.
 
 Compile-time integration target:
 
@@ -27,6 +27,8 @@ Compile-time integration target:
 | FTB Teams (NeoForge) | 2101.1.9 |
 | FTB Library (NeoForge) | 2101.1.36 |
 | Architectury (NeoForge) | 13.0.8 |
+| Xaero's Minimap (client; adapter target) | 26.6.0 |
+| XaeroLib (bundled in official minimap distribution) | 1.7.3 |
 
 Install optional FTB mods and their normal dependencies using their official distributions. These are not bundled into Homecoming. No pack or quest definitions are included. Compatibility with other releases is not established by compilation.
 
@@ -53,9 +55,17 @@ The parent workspace has a project-local JDK under `.tooling/jdk21`; it does not
 
 This is a first implementation, not a verified full-modpack release. Compilation and model tests do not substitute for the two-player check above. FTB titles are resolved on the server; untranslated pack language keys may be shown. Team quest completion is described as team progress, never credited to an offline individual. Current source completion and visibility are checked again when displaying FTB entries; resets/deleted quests are omitted rather than narrated as fresh completion.
 
-No API key, cloud service, raw chat logging, automatic chest scanning, generated quests, reward claiming or gameplay automation. No retroactive event history before installation/enrollment. No automatic Xaero waypoint creation yet: location display is a coordinate fallback pending a version-pinned client adapter. No KubeJS, Create, MineColonies or storage-network adapters yet.
+No API key, cloud service, raw chat logging, automatic chest scanning, generated quests, reward claiming or gameplay automation. No retroactive event history before installation/enrollment. The optional Xaero adapter tracks a location only on explicit click and requires the target world/dimension to be active; its in-game validation is pending. No KubeJS, Create, MineColonies or storage-network adapters yet.
 
-History uses Minecraft SavedData and follows normal world saves; an abrupt crash can lose updates since the last save. Keep normal world backups. Player preferences/session records remain until the world data is removed; opting out removes recipient access, not other players' shared history. Already seen coordinates cannot be made secret again. Team membership is checked at event capture and display, but full membership-era tracking across leave-and-rejoin cycles is not implemented.
+History uses Minecraft SavedData and follows normal world saves; an abrupt crash can lose updates since the last save. Keep normal world backups. Player preferences/session records remain until the world data is removed; opting out removes recipient access, not other players' shared history. Already seen coordinates cannot be made secret again. Membership changes establish a new history cutoff; live FTB leave/rejoin event validation is pending.
+
+## Server settings and development checks
+
+The world server config controls `returnPromptHours`, `retentionDays`, `maxHistoryEntries`, `briefingPageSize` and `groupingMinutes`. A grouping window of zero disables grouping.
+
+`gradlew runClient -PwithFtb -PwithXaero` starts a development client with the pinned integrations. If using the official downloaded minimap distribution, add `-PxaeroDistribution=/absolute/path/to/the.jar`; it includes XaeroLib.
+
+`gradlew runGameTestServer -PwithFtb -PruntimeChecks` runs the dedicated persistence check in `run-gametest`. Run it twice: the first emits `HOMECOMING_RESTART_FIXTURE_WRITTEN`, the second `HOMECOMING_RESTART_VERIFIED`. The runtime-check source set is excluded from normal builds and published JARs.
 
 ## Provenance
 

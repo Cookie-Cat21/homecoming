@@ -10,13 +10,31 @@ public final class Journal {
     public long droppedThrough;
     public List<Fact> facts = new ArrayList<>();
     public Map<String, PlayerState> players = new HashMap<>();
+    private transient long retentionMs = RETENTION_MS;
+    private transient int maxFacts = MAX_FACTS;
     public static final class PlayerState {
         public boolean enabled;
         public long acknowledged;
         public long offered;
         public long lastLogout;
+        public String currentTeam;
+        public long membershipStart;
+        public boolean quiet;
     }
     public record Place(String dimension, int x, int y, int z) {}
+    public void configure(long retentionMs, int maxFacts) {
+        if (retentionMs <= 0 || maxFacts < 1) throw new IllegalArgumentException("Invalid history limits");
+        this.retentionMs = retentionMs;
+        this.maxFacts = maxFacts;
+    }
+    public void updateTeam(String player, String team) {
+        var state = player(player);
+        if (state.currentTeam != null && !state.currentTeam.equals(team)) {
+            state.membershipStart = sequence;
+            state.offered = Math.max(state.offered, sequence);
+        }
+        state.currentTeam = team;
+    }
     public record Fact(long id, long time, String source, String key, String team,
                        Set<String> recipients, String message, Place place) {}
     public PlayerState player(String id) {
@@ -45,7 +63,7 @@ public final class Journal {
         prune(now);
         var state = player(player);
         if (!state.enabled) return List.of();
-        return facts.stream().filter(f -> f.id > state.acknowledged
+        return facts.stream().filter(f -> f.id > Math.max(state.acknowledged, state.membershipStart)
                 && f.recipients.contains(player) && f.team.equals(currentTeam)).toList();
     }
     public void acknowledge(String player) {
@@ -65,7 +83,7 @@ public final class Journal {
         facts.removeIf(f -> f.recipients.isEmpty());
     }
     public void prune(long now) {
-        while (!facts.isEmpty() && (facts.size() > MAX_FACTS || now - facts.getFirst().time > RETENTION_MS)) {
+        while (!facts.isEmpty() && (facts.size() > maxFacts || now - facts.getFirst().time > retentionMs)) {
             droppedThrough = Math.max(droppedThrough, facts.removeFirst().id);
         }
     }

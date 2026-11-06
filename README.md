@@ -13,7 +13,7 @@ Homecoming reuses FTB Quests and FTB Teams instead of asking everyone to maintai
 - Opt-in participation and explicit read acknowledgment.
 - History stored with the world, bounded to 30 days / 2,000 updates.
 
-**Status:** version 0.1.0 compiles and passes six journal tests. Live two-player FTB testing is still needed. The current interface is clickable chat. The custom journal screen and Xaero waypoint adapter are proposed work.
+**Status:** 0.2.0-alpha.1 is in development with a native journal screen, authenticated client/server actions, configurable history, quest grouping, membership periods and a version-pinned Xaero adapter. Eleven model tests pass. A dedicated NeoForge server loaded the pinned FTB mods and verified SavedData persistence across two JVM runs. Live quest-event, map and full-pack validation is still in progress; see the [delivery checklist](docs/implementation-status.md).
 
 ## Build
 

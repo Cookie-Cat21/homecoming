@@ -4,8 +4,10 @@ import dev.ftb.mods.ftbquests.events.ObjectCompletedEvent;
 import dev.ftb.mods.ftbquests.quest.*;
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.Team;
+import dev.ftb.mods.ftbteams.api.event.TeamEvent;
 import dev.architectury.event.EventResult;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,6 +15,13 @@ import java.util.stream.Collectors;
 /** Isolated class: never loaded when the optional FTB mods are absent. */
 final class FtbIntegration implements Homecoming.Integration {
     FtbIntegration() {
+        TeamEvent.PLAYER_CHANGED.register(event -> {
+            var server = ServerLifecycleHooks.getCurrentServer();
+            if (server == null) return;
+            var data = JournalData.get(server);
+            data.journal.updateTeam(event.getPlayerId().toString(), event.getTeam().getId().toString());
+            data.setDirty();
+        });
         ObjectCompletedEvent.QUEST.register(e -> {
             record(e.getData(), e.getQuest(), "ftb.quest");
             return EventResult.pass();
@@ -58,18 +67,41 @@ final class FtbIntegration implements Homecoming.Integration {
         var object = file.get(Long.parseUnsignedLong(fact.key(), 16));
         return object != null && object.isVisible(progress.get()) && progress.get().isCompleted(object);
     }
-    @Override public List<String> suggestions(ServerPlayer player) {
+    @Override public List<BriefingView.Suggestion> suggestions(ServerPlayer player) {
         var file = ServerQuestFile.INSTANCE;
         if (file == null) return List.of();
         var progress = file.getTeamData(player);
         if (progress.isEmpty()) return List.of();
-        var result = new ArrayList<String>();
+        var candidates = new ArrayList<Quest>();
         file.forAllQuests(q -> {
-            if (result.size() < 2 && q.isVisible(progress.get()) && q.getChapter().isVisible(progress.get())
+            if (q.isVisible(progress.get()) && q.getChapter().isVisible(progress.get())
                     && !progress.get().isCompleted(q) && progress.get().canStartTasks(q))
-                result.add(q.getChapter().getTitle().getString() + " / " + q.getTitle().getString());
+                candidates.add(q);
         });
-        return result;
+        candidates.sort(Comparator.<Quest>comparingInt(q -> progress.get().isStarted(q) ? 0 : 1)
+                .thenComparingInt(q -> progress.get().isStarted(q.getChapter()) ? 0 : 1).thenComparingLong(q -> q.id));
+        return candidates.stream().limit(2).map(q -> new BriefingView.Suggestion(q.getChapter().getTitle().getString(),
+                q.getTitle().getString(), Long.toHexString(q.id),
+                Component.Serializer.toJson(q.getChapter().getTitle(), player.registryAccess()),
+                Component.Serializer.toJson(q.getTitle(), player.registryAccess()))).toList();
+    }
+    @Override public String chapterKey(Journal.Fact fact) {
+        if (!fact.source().startsWith("ftb.") || ServerQuestFile.INSTANCE == null) return "";
+        var object = ServerQuestFile.INSTANCE.get(Long.parseUnsignedLong(fact.key(), 16));
+        if (object instanceof Quest q) return Long.toHexString(q.getChapter().id);
+        return object instanceof Chapter chapter ? Long.toHexString(chapter.id) : "";
+    }
+    @Override public Component rowMessage(Briefing.Row row) {
+        if (ServerQuestFile.INSTANCE == null) return Homecoming.Integration.super.rowMessage(row);
+        QuestObject object;
+        try { object = ServerQuestFile.INSTANCE.get(Long.parseUnsignedLong(row.sourceKey(), 16)); }
+        catch (NumberFormatException ignored) { return Homecoming.Integration.super.rowMessage(row); }
+        if (object instanceof Chapter chapter)
+            return Component.literal("Your team completed chapter: ").append(chapter.getTitle());
+        if (object instanceof Quest quest) return row.count() > 1
+                ? Component.literal("Your team completed " + row.count() + " updates in ").append(quest.getChapter().getTitle())
+                : Component.literal("Your team completed quest: ").append(quest.getTitle());
+        return Homecoming.Integration.super.rowMessage(row);
     }
     @Override public String status() { return "FTB Quests + FTB Teams active; shared completion, available quests and team locations"; }
 }
