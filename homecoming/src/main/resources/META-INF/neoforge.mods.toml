@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="homecoming"
+version="0.1.0"
+displayName="Homecoming"
+description='''A factual, team-aware catch-up briefing for returning players.'''
+[[dependencies.homecoming]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.265,21.2)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.homecoming]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
+[[dependencies.homecoming]]
+modId="ftbquests"
+type="optional"
+versionRange="[2101.1.37,2102)"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.homecoming]]
+modId="ftbteams"
+type="optional"
+versionRange="[2101.1.9,2102)"
+ordering="AFTER"
+side="BOTH"

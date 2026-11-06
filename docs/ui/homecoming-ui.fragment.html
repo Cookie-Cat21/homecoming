@@ -1,0 +1,111 @@
+<div id="hc-preview" class="viz-carousel viz-dotted-background" aria-label="Homecoming interface concepts">
+  <section data-variant="Catch-up journal" aria-label="Proposed Homecoming journal">
+    <div class="hc-stage">
+      <div class="hc-world" aria-hidden="true"><span>COMMUNITY SMP</span><div class="hc-horizon"></div></div>
+      <div class="hc-window">
+        <header class="hc-header"><div><span class="hc-eyebrow">HOMECOMING</span><h2>Welcome back, Ovindu.</h2><p>You were away for 4 days.</p></div><span class="hc-edition">UI CONCEPT</span></header>
+        <div class="hc-content">
+          <div class="hc-feed">
+            <h3>While you were away</h3>
+            <article class="hc-update"><div class="hc-pixel" aria-hidden="true">✓</div><div><div class="hc-meta">FTB QUESTS · YESTERDAY</div><h4>Your team finished Basic Power</h4><p>A new chapter to catch up on in your quest book.</p><button type="button" class="hc-link cursor-interaction" data-action="quest">View quest details →</button><p class="hc-details" hidden>Basic Power · Team completion recorded yesterday.<br>Rewards and quest progress stay in FTB Quests.</p></div></article>
+            <article class="hc-update"><div class="hc-pixel hc-portal" aria-hidden="true">◆</div><div><div class="hc-meta">MILESTONE · 2 DAYS AGO</div><h4>Maya entered the Nether</h4><p>A shared milestone from your team.</p></div></article>
+            <article class="hc-update"><div class="hc-pixel" aria-hidden="true">⌖</div><div><div class="hc-meta">SHARED PLACE · YESTERDAY</div><h4>Community Storage</h4><p>Maya shared a location with your team.</p><div class="hc-location">Overworld · 248, 64, −132</div><button type="button" class="hc-button cursor-interaction" data-action="track">Track in Xaero’s</button><p class="hc-track-status" aria-live="polite"></p></div></article>
+          </div>
+          <aside class="hc-next"><span class="hc-eyebrow">PICK UP FROM HERE</span><h3>Something to work on</h3><div class="hc-item" aria-hidden="true">▦</div><h4>A place for everything</h4><p>An available quest in your Storage chapter.</p><button type="button" class="hc-button cursor-interaction" data-action="next">View in quest book</button><p class="hc-next-status" aria-live="polite"></p></aside>
+        </div>
+        <footer class="hc-footer"><span class="hc-footer-status" aria-live="polite">3 new updates · Your team only</span><button type="button" class="hc-button cursor-interaction" data-action="read">Mark these read</button></footer>
+      </div>
+    </div>
+  </section>
+  <section data-variant="Current chat build" aria-label="Current text-only Homecoming interface" hidden>
+    <div class="hc-stage hc-chat-stage">
+      <div class="hc-world" aria-hidden="true"><span>COMMUNITY SMP</span><div class="hc-horizon"></div></div>
+      <div class="hc-chat">
+        <div class="hc-chat-label">CURRENT BUILD · CHAT INTERFACE</div>
+        <p><span class="hc-chat-accent">— Homecoming —</span></p>
+        <p>Nov 5 18:40 UTC · Your team completed chapter: Basic Power</p>
+        <p>Nov 4 12:10 UTC · Maya earned We Need to Go Deeper</p>
+        <p>Nov 5 19:05 UTC · Maya shared Community Storage</p>
+        <p class="hc-chat-indent">minecraft:overworld · 248, 64, −132</p>
+        <div class="hc-chat-actions"><button type="button" class="hc-link cursor-interaction" data-action="chatread">[Mark these read]</button><button type="button" class="hc-link cursor-interaction" data-action="chatrefresh">[Refresh]</button></div>
+        <p>Available in your quest book: Storage / A place for everything</p>
+        <p class="hc-chat-status" aria-live="polite"></p>
+      </div>
+      <div class="hc-command">/recap<span aria-hidden="true">_</span></div>
+    </div>
+  </section>
+</div>
+<style>
+#hc-preview { --hc-paper:#d8d5ca; --hc-ink:#292c28; --hc-secondary:#51564e; --hc-line:#afafa2; --hc-button:#777b72; --hc-accent:#b7e3a0; font-family: ui-monospace,Consolas,monospace; }
+#hc-preview .hc-stage { min-height:650px; position:relative; padding:40px 22px 28px; box-sizing:border-box; isolation:isolate; }
+#hc-preview .hc-world { position:absolute; inset:0; z-index:-1; background:linear-gradient(#29434c 0 40%,#3d5546 40% 53%,#26382e 53% 100%); overflow:hidden; }
+#hc-preview .hc-world>span { position:absolute; left:18px; top:12px; color:#d4dfd5; font-size:10px; letter-spacing:2px; }
+#hc-preview .hc-horizon { position:absolute; inset:26% -8% 0; background:#263d32; clip-path:polygon(0 36%,12% 36%,12% 14%,24% 14%,24% 27%,36% 27%,36% 3%,47% 3%,47% 24%,59% 24%,59% 36%,69% 36%,69% 17%,83% 17%,83% 28%,100% 28%,100% 100%,0 100%); opacity:.7; }
+#hc-preview .hc-window { background:var(--hc-paper); color:var(--hc-ink); border:3px solid #242722; box-shadow:inset 2px 2px #f0ede3,inset -2px -2px #8a8d81,5px 5px 0 #17231d90; padding:22px; }
+#hc-preview h2,#hc-preview h3,#hc-preview h4,#hc-preview p { margin:0; }
+#hc-preview h2 { font-size:22px; line-height:1.35; font-weight:600; margin:5px 0; }
+#hc-preview h3 { font-size:14px; line-height:1.5; font-weight:600; }
+#hc-preview h4 { font-size:13px; line-height:1.5; font-weight:600; }
+#hc-preview p { font-size:12px; line-height:1.65; color:var(--hc-secondary); }
+#hc-preview .hc-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding-bottom:18px; border-bottom:2px solid var(--hc-line); }
+#hc-preview .hc-eyebrow { font-size:10px; letter-spacing:1.7px; font-weight:600; }
+#hc-preview .hc-edition { font-size:9px; color:var(--hc-secondary); white-space:nowrap; padding-top:3px; }
+#hc-preview .hc-content { display:grid; grid-template-columns:minmax(0,1fr) minmax(135px,.52fr); gap:24px; padding-top:18px; }
+#hc-preview .hc-update { display:grid; grid-template-columns:26px minmax(0,1fr); gap:11px; padding:18px 0; border-bottom:1px solid var(--hc-line); }
+#hc-preview .hc-update:last-child { border-bottom:0; }
+#hc-preview .hc-pixel { color:#3d603b; font-size:22px; line-height:1.2; text-align:center; }
+#hc-preview .hc-portal { color:#75517b; }
+#hc-preview .hc-meta { font-size:9px; letter-spacing:.6px; color:var(--hc-secondary); margin-bottom:5px; }
+#hc-preview .hc-link { font:inherit; font-size:11px; color:#365434; background:none; border:0; padding:9px 0 0; text-align:left; text-decoration:underline; text-underline-offset:3px; }
+#hc-preview .hc-button { font:inherit; font-size:11px; line-height:1.4; padding:9px 12px; color:#f8f7ef; background:var(--hc-button); border:2px solid #353a31; box-shadow:inset 1px 1px #b4b8aa,inset -1px -1px #50574a; text-shadow:1px 1px #31352d; }
+#hc-preview .hc-button:hover { background:#626d59; }
+#hc-preview button:focus-visible { outline:3px solid #407a39; outline-offset:3px; }
+#hc-preview .hc-button:disabled { opacity:.6; }
+#hc-preview .hc-location { font-size:11px; margin:8px 0 12px; color:#474f41; }
+#hc-preview .hc-next { border-left:2px solid var(--hc-line); padding-left:20px; }
+#hc-preview .hc-next .hc-eyebrow { font-size:9px; letter-spacing:1px; }
+#hc-preview .hc-next h3 { margin-top:7px; }
+#hc-preview .hc-item { margin:20px 0 9px; font-size:32px; color:#795d37; text-shadow:2px 2px #b5a384; }
+#hc-preview .hc-next p { margin:7px 0 14px; }
+#hc-preview .hc-next-status,#hc-preview .hc-track-status { margin-top:8px; color:#365434; }
+#hc-preview .hc-details { margin-top:8px; }
+#hc-preview .hc-footer { margin-top:12px; padding-top:16px; border-top:2px solid var(--hc-line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+#hc-preview .hc-footer-status { font-size:10px; color:var(--hc-secondary); }
+#hc-preview .hc-chat-stage { display:flex; flex-direction:column; justify-content:flex-end; gap:14px; }
+#hc-preview .hc-chat { background:#101c16e8; padding:18px; max-width:570px; color:#f3f3e9; text-shadow:1px 1px #000; }
+#hc-preview .hc-chat p { color:#e5e8dc; margin:8px 0; font-size:12px; overflow-wrap:anywhere; }
+#hc-preview .hc-chat-label { font-size:9px; letter-spacing:1px; color:#adb9aa; margin-bottom:16px; }
+#hc-preview .hc-chat-accent,#hc-preview .hc-chat .hc-link { color:var(--hc-accent); }
+#hc-preview .hc-chat-indent { padding-left:15px; }
+#hc-preview .hc-chat-actions { display:flex; gap:20px; flex-wrap:wrap; }
+#hc-preview .hc-command { padding:10px; background:#101c16e8; font-size:13px; color:#f4f4eb; }
+@media(max-width:540px) { #hc-preview .hc-stage { padding:38px 10px 20px; min-height:850px; } #hc-preview .hc-window { padding:16px; } #hc-preview .hc-content { grid-template-columns:1fr; gap:10px; } #hc-preview .hc-next { border-left:0; border-top:2px solid var(--hc-line); padding:16px 0 0; } #hc-preview .hc-item { display:none; } #hc-preview .hc-next h4 { margin-top:10px; } #hc-preview .hc-edition { display:none; } }
+</style>
+<script>
+(() => {
+  const root = document.getElementById('hc-preview');
+  root.querySelector('[data-action="quest"]').addEventListener('click', e => {
+    const details = root.querySelector('.hc-details');
+    details.hidden = !details.hidden;
+    e.currentTarget.textContent = details.hidden ? 'View quest details →' : 'Hide details ↑';
+  });
+  root.querySelector('[data-action="track"]').addEventListener('click', e => {
+    root.querySelector('.hc-track-status').textContent = 'Preview: waypoint added to your Homecoming set.';
+    e.currentTarget.textContent = '✓ Tracking location';
+  });
+  root.querySelector('[data-action="next"]').addEventListener('click', () => {
+    root.querySelector('.hc-next-status').textContent = 'Preview: opens Storage → A place for everything.';
+  });
+  root.querySelector('[data-action="read"]').addEventListener('click', e => {
+    root.querySelector('.hc-footer-status').textContent = 'Caught up. New updates will wait for your next visit.';
+    e.currentTarget.textContent = '✓ Marked read';
+    e.currentTarget.disabled = true;
+  });
+  root.querySelector('[data-action="chatread"]').addEventListener('click', () => {
+    root.querySelector('.hc-chat-status').textContent = 'Displayed updates marked read. Newer updates stay unread.';
+  });
+  root.querySelector('[data-action="chatrefresh"]').addEventListener('click', () => {
+    root.querySelector('.hc-chat-status').textContent = 'No additional shared updates in this preview.';
+  });
+})();
+</script>

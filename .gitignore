@@ -1,0 +1,7 @@
+.tooling/
+mindcraft/
+.env
+.env.*
+!.env.example
+*.log
+hs_err_pid*.log
