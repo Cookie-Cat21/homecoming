@@ -51,7 +51,7 @@ final class FtbIntegration implements Homecoming.Integration {
         var teamId = progress.getTeamId().toString();
         // Completion callbacks can precede the source state settling; validate on the server task queue.
         server.execute(() -> {
-            if (!progress.isCompleted(object) || !object.isVisible(progress)) return;
+            if (!progress.isCompleted(object) || !sourceVisible(object, progress)) return;
             var data = JournalData.get(server);
             data.journal.add(System.currentTimeMillis(), source, Long.toHexString(object.id), teamId, recipients,
                     "Your team completed " + (object instanceof Chapter ? "chapter: " : "quest: ") + object.getTitle().getString(), null);
@@ -65,7 +65,10 @@ final class FtbIntegration implements Homecoming.Integration {
         var progress = file.getTeamData(player);
         if (progress.isEmpty()) return false;
         var object = file.get(Long.parseUnsignedLong(fact.key(), 16));
-        return object != null && object.isVisible(progress.get()) && progress.get().isCompleted(object);
+        return object != null && sourceVisible(object, progress.get()) && progress.get().isCompleted(object);
+    }
+    private static boolean sourceVisible(QuestObject object, TeamData progress) {
+        return object.isVisible(progress) && (!(object instanceof Quest quest) || quest.getChapter().isVisible(progress));
     }
     @Override public List<BriefingView.Suggestion> suggestions(ServerPlayer player) {
         var file = ServerQuestFile.INSTANCE;

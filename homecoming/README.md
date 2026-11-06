@@ -1,6 +1,6 @@
 # Homecoming 0.2.0-alpha.1 — Minecraft 1.21.1 / NeoForge
 
-Validation: eleven model tests pass. Two separate dedicated GameTest JVM runs loaded the pinned FTB integrations and verified read/unread state from the real world SavedData file. The native client opens and enrollment works. Live quest-event coverage, Xaero behavior and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
+Validation: eleven model tests pass. Dedicated GameTest runs loaded the pinned FTB integrations, verified SavedData across process restarts and exercised actual CheckmarkTask completion, hidden-chapter filtering, recipient isolation and reset filtering using offline identities. The native UI was inspected at GUI scales 1 and 2; enrollment, prompt mute and acknowledgment work. A shared Overworld location was saved as a Xaero waypoint. Cross-dimension map checks, connected multiplayer and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
 
 An early, opt-in catch-up mod for a small friend-group SMP. Play normally; returning players can read shared milestones without maintaining another quest book.
 
