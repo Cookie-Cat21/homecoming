@@ -4,7 +4,7 @@ A catch-up companion for Minecraft **1.21.1 / NeoForge 21.1**. Return to your fr
 
 Homecoming reuses FTB Quests and FTB Teams instead of asking everyone to maintain another quest book. It works without an AI service.
 
-**Download:** [0.2.0-alpha.1 prerelease](https://github.com/Cookie-Cat21/homecoming/releases/tag/v0.2.0-alpha.1), including the JAR, SHA256 checksum, installation instructions and known limits. Connected-player feedback and full-pack gameplay validation remain open. Use the [friend-group pilot guide](docs/friend-group-pilot.md) for testing.
+**Download:** [0.2.0-alpha.2 prerelease](https://github.com/Cookie-Cat21/homecoming/releases/tag/v0.2.0-alpha.2), including the JAR, SHA256 checksum, installation instructions and known limits. Connected-player feedback and full-pack gameplay validation remain open. Use the [friend-group pilot guide](docs/friend-group-pilot.md) for testing.
 
 ## Early implementation
 
@@ -15,15 +15,19 @@ Homecoming reuses FTB Quests and FTB Teams instead of asking everyone to maintai
 - Opt-in participation and explicit read acknowledgment.
 - History stored with the world, bounded to 30 days / 2,000 updates.
 
-**Status:** 0.2.0-alpha.1 is in development with a native journal screen, authenticated client/server actions, configurable history, quest grouping, membership periods and a version-pinned Xaero adapter. Eleven model tests pass. A dedicated NeoForge server loaded the pinned FTB mods and verified SavedData persistence across two JVM runs. Live quest-event, map and full-pack validation is still in progress; see the [delivery checklist](docs/implementation-status.md).
+**Status:** 0.2.0-alpha.2 is in development with a native journal screen, authenticated client/server actions, configurable history, quest grouping, membership periods and a version-pinned Xaero adapter. Eleven model tests pass. A dedicated NeoForge server loaded the pinned FTB mods and verified SavedData persistence across two JVM runs. Live quest-event, map and full-pack validation is still in progress; see the [delivery checklist](docs/implementation-status.md).
 
-## Build
+## In-game journal
 
 Actual in-game journal, captured in the disposable test world on Minecraft 1.21.1 / NeoForge:
 
 ![Homecoming journal showing a shared location and Xaero tracking action](docs/ui/screenshots/homecoming-updates.png)
 
 The [Settings screenshot](docs/ui/screenshots/homecoming-settings.png) shows return-prompt controls and active integration status.
+
+See the [complete UI/engineering flowcharts](docs/ui/ui-flows.md), [design specification](docs/ui/interface-design.md), [Next steps capture](docs/ui/screenshots/homecoming-next-steps.png), and [read-only world rules](docs/ui/screenshots/homecoming-world-rules.png). Screenshots use sample quests in a disposable test world.
+
+## Build
 
 Install a Java 21 JDK, then:
 

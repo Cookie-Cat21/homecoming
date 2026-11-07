@@ -1,6 +1,6 @@
-# Homecoming 0.2.0-alpha.1 — Minecraft 1.21.1 / NeoForge
+# Homecoming 0.2.0-alpha.2 — Minecraft 1.21.1 / NeoForge
 
-Validation: eleven model tests pass. Dedicated GameTest runs loaded the pinned FTB integrations, verified SavedData across process restarts and exercised actual CheckmarkTask completion, hidden-chapter filtering, recipient isolation and reset filtering using offline identities. The native UI was inspected at GUI scales 1 and 2; enrollment, prompt mute and acknowledgment work. A shared Overworld location was saved as a Xaero waypoint. Cross-dimension rejection, restart deduplication and personal marker preservation passed in a real client. Connected multiplayer and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
+Validation: eleven model tests pass. Dedicated GameTest runs loaded the pinned FTB integrations, verified SavedData across process restarts and exercised actual CheckmarkTask completion, hidden-chapter filtering, recipient isolation and reset filtering using offline identities. The redesigned native UI was captured in Minecraft and exercised through real server read, reminder, disable and enable requests, confirmation/cancellation, source quest-book navigation and compact layout checks. A shared Overworld location was saved as a Xaero waypoint. Cross-dimension rejection, restart deduplication and personal marker preservation passed in a real client. Connected multiplayer and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
 
 An early, opt-in catch-up mod for a small friend-group SMP. Play normally; returning players can read shared milestones without maintaining another quest book.
 
@@ -17,7 +17,7 @@ An early, opt-in catch-up mod for a small friend-group SMP. Play normally; retur
 
 ## Install / build
 
-Use **Minecraft 1.21.1, NeoForge 21.1.262 or newer within 21.1, Java 21**. Put `homecoming-0.2.0-alpha.1.jar` from `build/libs` in server and client mods folders for the journal UI. Server-only installation uses chat. Optional mods have their own client/server requirements.
+Use **Minecraft 1.21.1, NeoForge 21.1.262 or newer within 21.1, Java 21**. Put `homecoming-0.2.0-alpha.2.jar` from `build/libs` in server and client mods folders for the journal UI. Server-only installation uses chat. Optional mods have their own client/server requirements.
 
 Compile-time integration target:
 
@@ -71,7 +71,7 @@ The same suite also exercises actual FTB completion, hidden/reset filtering, gro
 
 For opt-in client map regression checks, use a disposable development world and add `-PruntimeChecks -PclientChecks "-PtestWorld=Your disposable world"` to `runClient -PwithFtb -PwithXaero`. This creates personal/shared test markers in that world's map, writes `homecoming-xaero-result.txt`, and exits normally after the check. Run twice to test saved waypoint deduplication. It is a test harness and is excluded from normal builds.
 
-For reproducible screenshots, replace `-PclientChecks` with `-PpreviewJournal`. In the disposable integrated world this enrolls the test player, shares their current location through `/recap share`, opens the real authorized journal and captures Updates/Settings using Minecraft's screenshot API before exiting. It changes that test world's journal; never point it at an existing player world. Committed screenshots are in `docs/ui/screenshots` in the parent repository.
+For reproducible screenshots and UI flow checks, replace `-PclientChecks` with `-PpreviewJournal`. Use only a disposable integrated world: the harness seeds sample FTB quests, resets their test progress, acknowledges previous fixture history, shares a test location, exercises read/reminder/disable/enable and captures actual game frames. A fresh world's first run seeds quest definitions and exits; run again so the client loads those definitions before testing quest-book navigation. It changes that test world's journal and participation. Never point it at an existing player world. The durable result is `homecoming-ui-checks.txt`; normal builds exclude this harness. Committed captures are in `docs/ui/screenshots`.
 
 ## Provenance
 

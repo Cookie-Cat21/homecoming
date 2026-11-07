@@ -29,7 +29,7 @@ public final class HomecomingNetwork {
         @Override public Type<Response> type() { return TYPE; }
     }
     public static void register(RegisterPayloadHandlersEvent event) {
-        var registrar = event.registrar("2").optional();
+        var registrar = event.registrar("3").optional();
         registrar.playToServer(Request.TYPE, Request.CODEC, (request, context) -> context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer player)) return;
             long now = System.currentTimeMillis();
@@ -52,6 +52,10 @@ public final class HomecomingNetwork {
                     state.quiet = !state.quiet; data.setDirty(); send(player);
                 }
                 case "enable" -> { Homecoming.enable(player); send(player); }
+                case "disable" -> {
+                    var data = JournalData.get(player.server);
+                    data.journal.disable(player.getStringUUID()); data.setDirty(); send(player);
+                }
                 default -> { /* Unknown actions never execute commands or mutate arbitrary source data. */ }
             }
         }));

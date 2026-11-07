@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.148'
 }
-version = '0.2.0-alpha.1'
+version = '0.2.0-alpha.2'
 group = 'dev.homecoming'
 base { archivesName = 'homecoming' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -30,7 +30,11 @@ neoForge {
                 systemProperty 'neoforge.enableGameTest', 'false'
             }
             if (project.hasProperty('clientChecks')) systemProperty 'homecoming.clientChecks', 'true'
-            if (project.hasProperty('previewJournal')) systemProperty 'homecoming.previewJournal', 'true'
+            if (project.hasProperty('previewJournal')) {
+                systemProperty 'homecoming.previewJournal', 'true'
+                programArgument '--width'; programArgument '960'
+                programArgument '--height'; programArgument '800'
+            }
             if (project.hasProperty('testWorld')) {
                 programArgument '--quickPlaySingleplayer'
                 programArgument project.property('testWorld').toString()

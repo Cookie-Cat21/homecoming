@@ -42,6 +42,7 @@ public final class Homecoming {
         default String chapterKey(Journal.Fact fact) { return ""; }
         default Component rowMessage(Briefing.Row row) { return Component.literal(row.message()); }
         default String status() { return "Vanilla milestones; FTB Quests + Teams not installed"; }
+        default boolean hasTeamQuests() { return false; }
     }
     private void login(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
@@ -163,7 +164,9 @@ public final class Homecoming {
         var data = JournalData.get(player.server); var journal = data.journal;
         var state = journal.player(player.getStringUUID());
         journal.updateTeam(player.getStringUUID(), integration.team(player));
-        if (!state.enabled) return new BriefingView(false, state.quiet, false, List.of(), List.of(), integration.status());
+        var rules = new BriefingView.WorldRules(HomecomingConfig.RETURN_HOURS.get(), HomecomingConfig.RETENTION_DAYS.get(),
+                HomecomingConfig.MAX_FACTS.get(), HomecomingConfig.PAGE_SIZE.get(), HomecomingConfig.GROUP_MINUTES.get());
+        if (!state.enabled) return new BriefingView(false, state.quiet, false, List.of(), List.of(), integration.status(), rules, integration.hasTeamQuests());
         var facts = journal.unread(player.getStringUUID(), integration.team(player), System.currentTimeMillis()).stream()
                 .filter(f -> integration.visible(player, f)).toList();
         var selected = Briefing.select(facts, HomecomingConfig.PAGE_SIZE.get(), HomecomingConfig.GROUP_MINUTES.get() * 60_000L, integration::chapterKey);
@@ -172,6 +175,6 @@ public final class Homecoming {
         return new BriefingView(true, state.quiet, state.acknowledged < journal.droppedThrough,
                 selected.stream().map(row -> new BriefingView.Entry(row.through(), row.time(), row.message(),
                         Component.Serializer.toJson(integration.rowMessage(row), player.registryAccess()), row.place(), row.count())).toList(),
-                integration.suggestions(player), integration.status());
+                integration.suggestions(player), integration.status(), rules, integration.hasTeamQuests());
     }
 }

@@ -107,4 +107,5 @@ final class FtbIntegration implements Homecoming.Integration {
         return Homecoming.Integration.super.rowMessage(row);
     }
     @Override public String status() { return "FTB Quests + FTB Teams active; shared completion, available quests and team locations"; }
+    @Override public boolean hasTeamQuests() { return true; }
 }

@@ -8,8 +8,8 @@ public final class HomecomingClient {
     public static void receive(BriefingView view) {
         var minecraft = Minecraft.getInstance();
         if (minecraft.level == null || minecraft.player == null) return;
-        int tab = minecraft.screen instanceof JournalScreen screen ? screen.tab() : 0;
-        minecraft.setScreen(new JournalScreen(view, tab));
+        if (minecraft.screen instanceof JournalScreen screen) screen.receive(view);
+        else minecraft.setScreen(new JournalScreen(view, 0));
     }
     private HomecomingClient() {}
 }
