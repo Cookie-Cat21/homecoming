@@ -6,18 +6,27 @@ Objective: complete the runtime validation, returning-player scenario, briefing 
 
 - [x] Actual NeoForge server loads with pinned FTB integrations.
 - [x] Runtime quest events, hidden/reset quests and team isolation verified with offline identities in GameTest (connected-player pilot pending).
-- [ ] Returning-player history survives a real process restart.
+- [x] Returning-player history survives a real process restart (SavedData with simulated reader identities; connected-player scenario remains open).
 - [x] Configurable retention, prompt interval and briefing size.
-- [x] Membership periods prevent old access after leave/rejoin (model tests; live FTB event coverage pending).
-- [ ] Related quest completions collapse and suggestions prioritize meaningful progress.
+- [x] Membership periods prevent old access after leave/rejoin (real FTB party API/event check with offline identities).
+- [x] Related quest completions collapse and suggestions prioritize meaningful progress.
 - [x] Native journal screen and authenticated server/client actions.
-- [ ] Xaero 1.21.1 adapter creates the correct waypoint without touching personal sets.
+- [x] Xaero 1.21.1 adapter creates the correct waypoint without touching personal sets (Overworld creation, cross-dimension rejection and restart deduplication checked in a real client).
 - [x] UI inspected inside Minecraft at multiple GUI scales.
 - [ ] One real modpack release pinned and compatibility tested.
 - [ ] Friend-group pilot over actual return visits, with feedback.
 - [ ] Public alpha JAR, dependency matrix, installation and limitations published.
 
 Evidence and unresolved limits will be recorded here as work proceeds. Baseline: 0.1.0 builds locally and in CI and has six pure journal tests; it has not been live-tested.
+
+## Current follow-up evidence — 2026-11-07
+
+- Four dedicated GameTests pass on NeoForge **21.1.262**: real completion/visibility/reset handling, persistence, grouping/suggestions and party membership changes. Suggestions prefer a started available quest, then a quest in the active chapter; a started but dependency-locked quest is excluded. Two completed quests plus their chapter collapse into one briefing row with the correct acknowledgment cursor.
+- Real FTB `createParty`, `join` and `leave` calls with offline identities invoke Homecoming's membership listener. Leaving/rejoining prevents access to previous membership's history while new events remain readable.
+- An opt-in development client check ran in the disposable world using Xaero 26.6.0 / XaeroLib 1.7.3. It creates a separate personal fixture, tracks a shared Overworld location, checks duplicate clicks, rejects a Nether location on the Overworld map, and compares the personal marker's name, symbol and coordinates before/after.
+- A fresh client process on NeoForge **21.1.262** reloaded the saved map and emitted `HOMECOMING_XAERO_RUNTIME_VERIFIED dimension=minecraft:overworld persisted=true personalMarkers=1`. The shared waypoint remained unique after reload. A durable result is written to the development game directory. These checks are excluded from normal builds.
+- Minimum declared NeoForge version is now 21.1.262, after successful compilation, actual client launch/map checks and all four dedicated GameTests there; default development version remains 21.1.265.
+- Found E: with sufficient free space, resolving the C: capacity constraint without moving/deleting user files. Downloaded and verified all **5,113** files in the official FTB Skies 2 1.25.0 manifest into `E:/HomecomingTesting/ftb-skies-2-1.25.0`. Full-pack launch is in progress. See `docs/compatibility/ftb-skies-2-1.25.0.json` for exact manifest and dependency pins.
 
 ## Validation in progress — 2026-11-07
 

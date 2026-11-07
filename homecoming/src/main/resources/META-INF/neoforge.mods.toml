@@ -9,7 +9,7 @@ description='''A factual, team-aware catch-up briefing for returning players.'''
 [[dependencies.homecoming]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.265,21.2)"
+versionRange="[21.1.262,21.2)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.homecoming]]

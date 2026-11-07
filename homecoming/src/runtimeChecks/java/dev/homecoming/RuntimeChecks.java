@@ -22,6 +22,79 @@ import com.mojang.authlib.GameProfile;
 @GameTestHolder("homecoming")
 @PrefixGameTestTemplate(false)
 public final class RuntimeChecks {
+    @GameTest(template="empty")
+    public static void ftbMembershipPeriods(GameTestHelper helper) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        var server=helper.getLevel().getServer();
+        var manager=(TeamManagerImpl)FTBTeamsAPI.api().getManager();
+        var owner=new GameProfile(UUID.randomUUID(),"runtime-owner");
+        var reader=new GameProfile(UUID.randomUUID(),"runtime-member");
+        manager.playerLoggedIn(null,owner.getId(),owner.getName());
+        manager.playerLoggedIn(null,reader.getId(),reader.getName());
+        var j=JournalData.get(server).journal;
+        j.player(reader.getId().toString()).enabled=true;
+        var party=manager.createParty(owner.getId(),null,"Homecoming membership check",null,null);
+        party.join(null,reader);
+        String id=reader.getId().toString(), team=party.getId().toString();
+        long now=System.currentTimeMillis();
+        j.add(now,"runtime","before-leave",team,Set.of(id),"Before leaving",null);
+        helper.assertTrue(j.unread(id,team,now).size()==1,"Joined reader receives current party history");
+        party.leave(reader.getId());
+        helper.assertTrue(j.player(id).currentTeam.equals(id),"FTB leave event switches journal back to personal team");
+        party.join(null,reader);
+        helper.assertTrue(j.player(id).currentTeam.equals(team),"FTB rejoin event restores current party");
+        helper.assertTrue(j.unread(id,team,now).isEmpty(),"Rejoining must not restore history from prior membership");
+        j.add(now+1,"runtime","after-rejoin",team,Set.of(id),"After rejoining",null);
+        helper.assertTrue(j.unread(id,team,now+2).size()==1,"New membership still receives future progress");
+        System.out.println("HOMECOMING_FTB_MEMBERSHIP_PERIODS_VERIFIED");
+        helper.succeed();
+    }
+    @GameTest(template="empty", timeoutTicks=200)
+    public static void groupedBriefingAndSuggestions(GameTestHelper helper) {
+        var server=helper.getLevel().getServer();
+        var player=new ServerPlayer(server,helper.getLevel(),new GameProfile(UUID.randomUUID(),"runtime-planner"),ClientInformation.createDefault());
+        var manager=(TeamManagerImpl)FTBTeamsAPI.api().getManager();
+        manager.playerLoggedIn(null,player.getUUID(),"Homecoming runtime planner");
+        var team=manager.getTeamForPlayer(player).orElseThrow();
+        var file=ServerQuestFile.INSTANCE;
+        var active=new Chapter(file.newID(),file,file.getDefaultChapterGroup()); active.onCreated();
+        var started=new Quest(file.newID(),active); started.onCreated();
+        new CheckmarkTask(file.newID(),started).onCreated();
+        var next=new Quest(file.newID(),active); next.onCreated();
+        new CheckmarkTask(file.newID(),next).onCreated();
+        var locked=new Quest(file.newID(),active); locked.onCreated();
+        new CheckmarkTask(file.newID(),locked).onCreated(); locked.addDependency(next);
+        var other=new Chapter(file.newID(),file,file.getDefaultChapterGroup()); other.onCreated();
+        var unrelated=new Quest(file.newID(),other); unrelated.onCreated();
+        new CheckmarkTask(file.newID(),unrelated).onCreated();
+        file.clearCachedData();
+        var progress=file.getOrCreateTeamData(team);
+        progress.setStarted(active.id,new java.util.Date());
+        progress.setStarted(started.id,new java.util.Date());
+        // Even a started quest must not be suggested while its dependency is locked.
+        progress.setStarted(locked.id,new java.util.Date());
+        var suggestions=Homecoming.integration.suggestions(player);
+        helper.assertTrue(suggestions.size()==2,"Briefing should offer two available existing quests");
+        helper.assertTrue(suggestions.getFirst().questId().equals(Long.toHexString(started.id)),"Started available quest comes first");
+        helper.assertTrue(suggestions.getLast().questId().equals(Long.toHexString(next.id)),"Available quest in active chapter comes before unrelated chapters");
+
+        var completedChapter=new Chapter(file.newID(),file,file.getDefaultChapterGroup()); completedChapter.onCreated();
+        var first=new Quest(file.newID(),completedChapter); first.onCreated();
+        var firstTask=new CheckmarkTask(file.newID(),first); firstTask.onCreated();
+        var second=new Quest(file.newID(),completedChapter); second.onCreated();
+        var secondTask=new CheckmarkTask(file.newID(),second); secondTask.onCreated();
+        file.clearCachedData();
+        var data=JournalData.get(server); data.journal.player(player.getStringUUID()).enabled=true;
+        data.journal.updateTeam(player.getStringUUID(),team.getId().toString());
+        progress.setProgress(firstTask,1); progress.setProgress(secondTask,1);
+        helper.runAfterDelay(5, () -> {
+            var view=Homecoming.view(player);
+            helper.assertTrue(view.updates().size()==1,"Related actual quest and chapter completions should share one briefing row");
+            helper.assertTrue(view.updates().getFirst().count()==3,"Grouped row retains both quest events and chapter completion");
+            helper.assertTrue(data.journal.player(player.getStringUUID()).offered==view.updates().getFirst().id(),"Acknowledgment cursor covers the displayed group");
+            System.out.println("HOMECOMING_GROUPING_AND_SUGGESTIONS_VERIFIED");
+            helper.succeed();
+        });
+    }
     @GameTest(template="empty", timeoutTicks=200)
     public static void ftbCompletionAndVisibility(GameTestHelper helper) {
         var server=helper.getLevel().getServer();

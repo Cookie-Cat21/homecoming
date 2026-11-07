@@ -1,0 +1,54 @@
+{
+  "pack": "FTB Skies 2",
+  "version": "1.25.0",
+  "packId": 129,
+  "versionId": 100589,
+  "manifestUrl": "https://api.feed-the-beast.com/v1/modpacks/public/modpack/129/100589",
+  "downloadedManifestSha256": "74fe1e47da555a9736c0d84ed839de71f4d1cb98e75b266ce4f6d2db34ecc545",
+  "targets": [
+    {
+      "id": -1,
+      "name": "minecraft",
+      "version": "1.21.1",
+      "type": "game",
+      "updated": 0
+    },
+    {
+      "id": -1,
+      "name": "neoforge",
+      "version": "21.1.262",
+      "type": "modloader",
+      "updated": 0
+    },
+    {
+      "id": -1,
+      "name": "java",
+      "version": "21.0.4+7-LTS",
+      "type": "runtime",
+      "updated": 0
+    }
+  ],
+  "integrationFiles": [
+    {
+      "name": "ftb-library-neoforge-2101.1.37.jar",
+      "sha256": "624c2d2d1cbadb946d967e17757bd5b2d129d4d3ed71f2da0c70607d04476ac2",
+      "url": "https://edge.forgecdn.net/files/9008/89/ftb-library-neoforge-2101.1.37.jar"
+    },
+    {
+      "name": "ftb-quests-neoforge-2101.1.37.jar",
+      "sha256": "6b42457d680108d0af5b8deb21e3fe7b92138209f0683c62441dc360d4fc01d5",
+      "url": "https://edge.forgecdn.net/files/9298/629/ftb-quests-neoforge-2101.1.37.jar"
+    },
+    {
+      "name": "ftb-teams-neoforge-2101.1.11.jar",
+      "sha256": "e6bcd670493624e6906df872a9c6af4a33fe6405cac57a32c59cd4cd5838c655",
+      "url": "https://edge.forgecdn.net/files/8724/782/ftb-teams-neoforge-2101.1.11.jar"
+    },
+    {
+      "name": "architectury-13.0.11-neoforge.jar",
+      "sha256": "9cc92f2c09533fc5482c60f993bd891c655a0e32b637037cdcb7c2b23adedeeb",
+      "url": "https://edge.forgecdn.net/files/8492/726/architectury-13.0.11-neoforge.jar"
+    }
+  ],
+  "status": "Manifest pinned; full-pack runtime validation pending."
+}

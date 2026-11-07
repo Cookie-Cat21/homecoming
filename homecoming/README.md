@@ -1,6 +1,6 @@
 # Homecoming 0.2.0-alpha.1 — Minecraft 1.21.1 / NeoForge
 
-Validation: eleven model tests pass. Dedicated GameTest runs loaded the pinned FTB integrations, verified SavedData across process restarts and exercised actual CheckmarkTask completion, hidden-chapter filtering, recipient isolation and reset filtering using offline identities. The native UI was inspected at GUI scales 1 and 2; enrollment, prompt mute and acknowledgment work. A shared Overworld location was saved as a Xaero waypoint. Cross-dimension map checks, connected multiplayer and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
+Validation: eleven model tests pass. Dedicated GameTest runs loaded the pinned FTB integrations, verified SavedData across process restarts and exercised actual CheckmarkTask completion, hidden-chapter filtering, recipient isolation and reset filtering using offline identities. The native UI was inspected at GUI scales 1 and 2; enrollment, prompt mute and acknowledgment work. A shared Overworld location was saved as a Xaero waypoint. Cross-dimension rejection, restart deduplication and personal marker preservation passed in a real client. Connected multiplayer and full-pack compatibility remain in progress; see [current evidence](../docs/implementation-status.md).
 
 An early, opt-in catch-up mod for a small friend-group SMP. Play normally; returning players can read shared milestones without maintaining another quest book.
 
@@ -17,7 +17,7 @@ An early, opt-in catch-up mod for a small friend-group SMP. Play normally; retur
 
 ## Install / build
 
-Use **Minecraft 1.21.1, NeoForge 21.1.265 or newer within 21.1, Java 21**. Put `homecoming-0.2.0-alpha.1.jar` from `build/libs` in server and client mods folders for the journal UI. Server-only installation uses chat. Optional mods have their own client/server requirements.
+Use **Minecraft 1.21.1, NeoForge 21.1.262 or newer within 21.1, Java 21**. Put `homecoming-0.2.0-alpha.1.jar` from `build/libs` in server and client mods folders for the journal UI. Server-only installation uses chat. Optional mods have their own client/server requirements.
 
 Compile-time integration target:
 
@@ -55,7 +55,7 @@ The parent workspace has a project-local JDK under `.tooling/jdk21`; it does not
 
 This is a first implementation, not a verified full-modpack release. Compilation and model tests do not substitute for the two-player check above. FTB titles are resolved on the server; untranslated pack language keys may be shown. Team quest completion is described as team progress, never credited to an offline individual. Current source completion and visibility are checked again when displaying FTB entries; resets/deleted quests are omitted rather than narrated as fresh completion.
 
-No API key, cloud service, raw chat logging, automatic chest scanning, generated quests, reward claiming or gameplay automation. No retroactive event history before installation/enrollment. The optional Xaero adapter tracks a location only on explicit click and requires the target world/dimension to be active; its in-game validation is pending. No KubeJS, Create, MineColonies or storage-network adapters yet.
+No API key, cloud service, raw chat logging, automatic chest scanning, generated quests, reward claiming or gameplay automation. No retroactive event history before installation/enrollment. The optional Xaero adapter tracks a location only on explicit click and requires the target world/dimension to be active; Overworld creation, cross-dimension rejection, restart deduplication and personal marker preservation passed in real-client checks. No KubeJS, Create, MineColonies or storage-network adapters yet.
 
 History uses Minecraft SavedData and follows normal world saves; an abrupt crash can lose updates since the last save. Keep normal world backups. Player preferences/session records remain until the world data is removed; opting out removes recipient access, not other players' shared history. Already seen coordinates cannot be made secret again. Membership changes establish a new history cutoff; live FTB leave/rejoin event validation is pending.
 
@@ -66,6 +66,10 @@ The world server config controls `returnPromptHours`, `retentionDays`, `maxHisto
 `gradlew runClient -PwithFtb -PwithXaero` starts a development client with the pinned integrations. If using the official downloaded minimap distribution, add `-PxaeroDistribution=/absolute/path/to/the.jar`; it includes XaeroLib.
 
 `gradlew runGameTestServer -PwithFtb -PruntimeChecks` runs the dedicated persistence check in `run-gametest`. Run it twice: the first emits `HOMECOMING_RESTART_FIXTURE_WRITTEN`, the second `HOMECOMING_RESTART_VERIFIED`. The runtime-check source set is excluded from normal builds and published JARs.
+
+The same suite also exercises actual FTB completion, hidden/reset filtering, group selection, suggestion priority and party leave/rejoin events using offline identities. Add `-PneoForgeVersion=21.1.262` to reproduce checks on the selected pack's loader version.
+
+For opt-in client map regression checks, use a disposable development world and add `-PruntimeChecks -PclientChecks "-PtestWorld=Your disposable world"` to `runClient -PwithFtb -PwithXaero`. This creates personal/shared test markers in that world's map, writes `homecoming-xaero-result.txt`, and exits normally after the check. Run twice to test saved waypoint deduplication. It is a test harness and is excluded from normal builds.
 
 ## Provenance
 
