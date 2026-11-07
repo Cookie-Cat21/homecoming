@@ -30,6 +30,7 @@ neoForge {
                 systemProperty 'neoforge.enableGameTest', 'false'
             }
             if (project.hasProperty('clientChecks')) systemProperty 'homecoming.clientChecks', 'true'
+            if (project.hasProperty('previewJournal')) systemProperty 'homecoming.previewJournal', 'true'
             if (project.hasProperty('testWorld')) {
                 programArgument '--quickPlaySingleplayer'
                 programArgument project.property('testWorld').toString()

@@ -71,6 +71,8 @@ The same suite also exercises actual FTB completion, hidden/reset filtering, gro
 
 For opt-in client map regression checks, use a disposable development world and add `-PruntimeChecks -PclientChecks "-PtestWorld=Your disposable world"` to `runClient -PwithFtb -PwithXaero`. This creates personal/shared test markers in that world's map, writes `homecoming-xaero-result.txt`, and exits normally after the check. Run twice to test saved waypoint deduplication. It is a test harness and is excluded from normal builds.
 
+For reproducible screenshots, replace `-PclientChecks` with `-PpreviewJournal`. In the disposable integrated world this enrolls the test player, shares their current location through `/recap share`, opens the real authorized journal and captures Updates/Settings using Minecraft's screenshot API before exiting. It changes that test world's journal; never point it at an existing player world. Committed screenshots are in `docs/ui/screenshots` in the parent repository.
+
 ## Provenance
 
 Build wrapper/template: NeoForgeMDKs/MDK-1.21.1-ModDevGradle. See TEMPLATE_LICENSE.txt for template terms. Optional FTB APIs are referenced, not redistributed. Homecoming's own licensing is currently All Rights Reserved pending the owner's choice.

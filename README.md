@@ -19,6 +19,12 @@ Homecoming reuses FTB Quests and FTB Teams instead of asking everyone to maintai
 
 ## Build
 
+Actual in-game journal, captured in the disposable test world on Minecraft 1.21.1 / NeoForge:
+
+![Homecoming journal showing a shared location and Xaero tracking action](docs/ui/screenshots/homecoming-updates.png)
+
+The [Settings screenshot](docs/ui/screenshots/homecoming-settings.png) shows return-prompt controls and active integration status.
+
 Install a Java 21 JDK, then:
 
 ```sh
