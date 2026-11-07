@@ -50,5 +50,5 @@
       "url": "https://edge.forgecdn.net/files/8492/726/architectury-13.0.11-neoforge.jar"
     }
   ],
-  "status": "Manifest pinned; full-pack runtime validation pending."
+  "status": "All 5113 manifest files downloaded and size/hash verified. Production launch reached resource loading; full-pack world validation remains open due to Windows memory commit pressure. No full-pack gameplay compatibility claim."
 }
