@@ -15,7 +15,7 @@ Objective: complete the runtime validation, returning-player scenario, briefing 
 - [x] UI inspected inside Minecraft at multiple GUI scales.
 - [ ] One real modpack release pinned and compatibility tested.
 - [ ] Friend-group pilot over actual return visits, with feedback.
-- [ ] Public alpha JAR, dependency matrix, installation and limitations published.
+- [x] Public alpha JAR, dependency matrix, installation and limitations published.
 
 Evidence and unresolved limits will be recorded here as work proceeds. Baseline: 0.1.0 builds locally and in CI and has six pure journal tests; it has not been live-tested.
 
@@ -29,6 +29,8 @@ Evidence and unresolved limits will be recorded here as work proceeds. Baseline:
 - Found E: with sufficient free space, resolving the C: capacity constraint without moving/deleting user files. Downloaded and verified all **5,113** files in the official FTB Skies 2 1.25.0 manifest into `E:/HomecomingTesting/ftb-skies-2-1.25.0`. Full-pack launch is in progress. See `docs/compatibility/ftb-skies-2-1.25.0.json` for exact manifest and dependency pins.
 - Full-pack development launch exposed bundled test registration against an absent optional mod. Switched to the official production launcher profile and official install processors, using cached Mojang client/mapping files verified against their official SHA1 values where downloads reset connections. The production launch passed mod initialization and reached resource reload, then failed a native-memory allocation under the current Windows commit limit. A retry with a 5 GB heap and reduced JVM workers is in progress. Full-pack runtime compatibility remains unverified.
 - A concrete [friend-group pilot guide](friend-group-pilot.md) now covers two connected players, restart, acknowledgments, quest links, team isolation, leave/rejoin, maps and feedback over two actual return visits. Real participant observations remain outstanding.
+- Published [v0.2.0-alpha.1](https://github.com/Cookie-Cat21/homecoming/releases/tag/v0.2.0-alpha.1) with a normal-build JAR, SHA256 sidecar, exact integration baseline, installation steps and explicit outstanding validation. Release points to commit `e9a38a4`; development fixtures are absent from its JAR. This is an experimental pilot build, not a completed friend-group pilot or a full-pack compatibility claim.
+- The 5 GB production-pack attempt also hit the Windows memory commit limit (74 MB remaining at failure); Java heap occupancy was about 2.9 GB while committed capacity had grown to about 4.6 GB. Retrying the same complete pack with a 4 GB cap. Desktop captures currently show a clock/screensaver; the user has been asked to unlock before further UI inspection.
 
 ## Validation in progress — 2026-11-07
 

@@ -4,6 +4,8 @@ A catch-up companion for Minecraft **1.21.1 / NeoForge 21.1**. Return to your fr
 
 Homecoming reuses FTB Quests and FTB Teams instead of asking everyone to maintain another quest book. It works without an AI service.
 
+**Download:** [0.2.0-alpha.1 prerelease](https://github.com/Cookie-Cat21/homecoming/releases/tag/v0.2.0-alpha.1), including the JAR, SHA256 checksum, installation instructions and known limits. Connected-player feedback and full-pack gameplay validation remain open. Use the [friend-group pilot guide](docs/friend-group-pilot.md) for testing.
+
 ## Early implementation
 
 - Team quest and chapter completion briefings.
